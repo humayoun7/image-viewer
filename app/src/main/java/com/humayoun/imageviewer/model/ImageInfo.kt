@@ -3,6 +3,10 @@ package com.humayoun.imageviewer.model
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+/**
+ * data class to represent Image Info object returned from the Picsum service
+ * */
+
 @JsonClass(generateAdapter = true)
 data class ImageInfo(
     @Json(name = "id") val id: String?,

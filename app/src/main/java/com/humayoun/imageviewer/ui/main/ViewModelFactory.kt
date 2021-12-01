@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.humayoun.imageviewer.repository.ImageRepository
 
 /**
- * Factory to provide ViewModels
+ * Factory to provide ViewModel
  */
 
 class ViewModelFactory(private val repository: ImageRepository) : ViewModelProvider.Factory {

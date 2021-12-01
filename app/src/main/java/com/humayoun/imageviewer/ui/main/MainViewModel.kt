@@ -1,8 +1,12 @@
 package com.humayoun.imageviewer.ui.main
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.humayoun.imageviewer.repository.ImageRepository
+
+
+/**
+ * To control application/business logic
+ */
 
 class MainViewModel(private val imageRepository: ImageRepository) : ViewModel() {
 
@@ -12,18 +16,14 @@ class MainViewModel(private val imageRepository: ImageRepository) : ViewModel() 
     var currentIndex = 0
     var startTime = System.currentTimeMillis()
 
-
-
     fun getImageList () {
-        Log.i("MainViewModel", "getImageList page: "+page+", currentIndex:"+currentIndex)
         imageRepository.getImageList(page, limit)
     }
 
     fun updateConfig () {
-        Log.i("MainViewModel", "updateConfig page: "+page+", currentIndex:"+currentIndex)
-        // reset page if all no more results are returned
+        // reset page if no more results are returned
         imageInfoListResults.value?.size?.let { size ->
-            if(size ==0) {
+            if(size == 0) {
                 page = 0
                 currentIndex = 0
                 getImageList()
