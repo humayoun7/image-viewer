@@ -3,6 +3,7 @@ package com.humayoun.imageviewer.ui.main
 import android.graphics.drawable.Drawable
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -46,9 +47,17 @@ class MainFragment : Fragment() {
 
     private fun init() {
         viewModel = ViewModelProvider(requireActivity(), Injection.provideViewModelFactory()).get(MainViewModel::class.java)
-        viewModel.getImageList()
+
         addListeners()
+        if(viewModel.imageInfoListResults.value.isNullOrEmpty()){
+            viewModel.getImageList()
+        }
+
+        // used when restoring state from config changes
+        selectAndShowImage(false)
     }
+
+
 
     fun loadNewImageUsingGlide (url: String = Constants.PicsumService.FALLBACK_IMAGE_URL) {
         binding.progressBar.visibility = View.VISIBLE
@@ -57,9 +66,7 @@ class MainFragment : Fragment() {
         Glide
             .with(this)
             .load(url)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
             .centerCrop()
-            .skipMemoryCache(true)
             .listener(object: RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -68,7 +75,7 @@ class MainFragment : Fragment() {
                     isFirstResource: Boolean
                 ): Boolean {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(requireActivity(), R.string.error_image_load, Toast.LENGTH_SHORT)
+                    Toast.makeText(requireActivity(), R.string.error_image_load, Toast.LENGTH_LONG).show()
                     return false
                 }
 
@@ -94,22 +101,28 @@ class MainFragment : Fragment() {
         viewModel.imageInfoListResults.observe(requireActivity(),Observer{
             // for initial load only
             if(viewModel.page == 1 && viewModel.currentIndex == 0) {
-                selectAndShowImage()
+                selectAndShowImage(false)
             }
         })
 
         // imageview click listener
         binding.imageView.setOnClickListener(View.OnClickListener {
-            selectAndShowImage()
+            selectAndShowImage(true)
         })
-
     }
 
-    fun selectAndShowImage() {
-        val imageInfo = viewModel.imageInfoListResults.value?.get(viewModel.currentIndex++)
-        viewModel.updateConfig()
-        viewModel.startTime = System.currentTimeMillis()
-        setData(imageInfo)
+    fun selectAndShowImage(showNext: Boolean) {
+        viewModel.imageInfoListResults.value?.let { imageInfoList ->
+            if(imageInfoList.isNotEmpty()) {
+                if (showNext) {
+                    viewModel.updateConfig()
+                }
+
+                val imageInfo = imageInfoList.get(viewModel.currentIndex)
+                viewModel.startTime = System.currentTimeMillis()
+                setData(imageInfo)
+            }
+        }
     }
 
     fun setData(imageInfo: ImageInfo?) {

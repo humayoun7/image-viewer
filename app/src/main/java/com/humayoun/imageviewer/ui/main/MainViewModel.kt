@@ -21,6 +21,7 @@ class MainViewModel(private val imageRepository: ImageRepository) : ViewModel() 
     }
 
     fun updateConfig () {
+        ++currentIndex
         // reset page if no more results are returned
         imageInfoListResults.value?.size?.let { size ->
             if(size == 0) {
