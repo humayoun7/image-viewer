@@ -13,7 +13,7 @@ import java.util.concurrent.Executors
  * useful utilities
  * */
 
-// to load image without using any library
+// to load image without using any library - additional method
 fun loadNewImage (url: String = Constants.PicsumService.FALLBACK_IMAGE_URL, imageView: ImageView) {
     // Declaring executor to parse the URL
     val executor = Executors.newSingleThreadExecutor()
