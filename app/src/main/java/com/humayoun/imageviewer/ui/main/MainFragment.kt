@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -54,12 +55,12 @@ class MainFragment : Fragment() {
         }
 
         // used when restoring state from config changes
-        selectAndShowImage(false)
+        selectAndShowImage(false, binding.imageView)
     }
 
 
 
-    fun loadNewImageUsingGlide (url: String = Constants.PicsumService.FALLBACK_IMAGE_URL) {
+    fun loadNewImageUsingGlide (url: String = Constants.PicsumService.FALLBACK_IMAGE_URL, imageView: ImageView = binding.imageView) {
         binding.progressBar.visibility = View.VISIBLE
         binding.txtImageLoadTime.text =  "-"
 
@@ -93,7 +94,7 @@ class MainFragment : Fragment() {
                 }
 
             })
-            .into(binding.imageView);
+            .into(imageView);
     }
 
     fun addListeners () {
@@ -101,17 +102,23 @@ class MainFragment : Fragment() {
         viewModel.imageInfoListResults.observe(requireActivity(),Observer{
             // for initial load only
             if(viewModel.page == 1 && viewModel.currentIndex == 0) {
-                selectAndShowImage(false)
+                selectAndShowImage(false, binding.imageView)
+                selectAndShowImage(false, binding.imageView2)
+
             }
         })
 
         // imageview click listener
         binding.imageView.setOnClickListener(View.OnClickListener {
-            selectAndShowImage(true)
+            selectAndShowImage(true, binding.imageView)
+        })
+
+        binding.imageView2.setOnClickListener(View.OnClickListener {
+            selectAndShowImage(true, binding.imageView2)
         })
     }
 
-    fun selectAndShowImage(showNext: Boolean) {
+    fun selectAndShowImage(showNext: Boolean, imageView: ImageView) {
         viewModel.imageInfoListResults.value?.let { imageInfoList ->
             if(imageInfoList.isNotEmpty()) {
                 if (showNext) {
@@ -120,13 +127,13 @@ class MainFragment : Fragment() {
 
                 val imageInfo = imageInfoList.get(viewModel.currentIndex)
                 viewModel.startTime = System.currentTimeMillis()
-                setData(imageInfo)
+                setData(imageInfo, imageView)
             }
         }
     }
 
-    fun setData(imageInfo: ImageInfo?) {
-        imageInfo?.downloadUrl?.let { it1 -> loadNewImageUsingGlide(it1) }
+    fun setData(imageInfo: ImageInfo?, imageView: ImageView) {
+        imageInfo?.downloadUrl?.let { it1 -> loadNewImageUsingGlide(it1, imageView) }
         imageInfo?.id?.let { it1 -> binding.txtImageId.text = it1 }
         imageInfo?.width?.let { it1 -> binding.txtImageWidth.text = it1.toString() + "px" }
         imageInfo?.height?.let { it1 -> binding.txtImageHeight.text = it1.toString() + "px" }
